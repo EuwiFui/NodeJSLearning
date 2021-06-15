@@ -1,24 +1,23 @@
 var events = require("events");
 var eventEmitter = new events.EventEmitter();
+var sleep = require("../Util/sleep");
 
 eventEmitter.on("connection", connectHandler);
 eventEmitter.on("data_recieved", dataRecievedHandler);
 
 /*
     eventEmitter调用emit方法触发connection事件，
-    绑定在connection上的监听器开始执行（另一个进程）
-    调用emit后，程序继续进行，使得connection的监听器（绑定的回调函数）与
-    当前主线程并行
+    connection事件结束后，监听器进入监听器队列开始执行(事件在另一个线程中，事件结束后，回调函数在主线程中回调，与主线程在同一个进程)
 */
 eventEmitter.emit("connection");
+
+sleep(3000);
 console.log("process end.");
 
 function connectHandler(){
-    setTimeout(function(){
-        console.log("connected successfully.");
-
-        eventEmitter.emit("data_recieved");
-    }, 1000);
+    sleep(4000);
+    console.log("connected successfully.");
+    eventEmitter.emit("data_recieved");
 }
 
 function dataRecievedHandler(){
